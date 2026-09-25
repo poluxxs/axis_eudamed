@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import re
 
-def create_device_xml(
+def create_udidata_xml(
     risk_class,
     model,
     name,
@@ -22,90 +22,57 @@ def create_device_xml(
     number_of_items,
     start_date="2020-02-01+01:00"
 ):
+    # Correct errors within primary DI
+    if not basic_UDIDI.startswith("076"):
+        basic_UDIDI = "0" + basic_UDIDI
 
     #for compliance assure that there is no space and that there is a . not a , in the numbers
     diameter = re.sub(r"\s+", "", str(diameter)).replace(",", ".")
     length = re.sub(r"\s+", "", str(length)).replace(",", ".")
 
-    Device = "https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/v1"
+    UDIDIData = "https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/v1"
     XSI = "http://www.w3.org/2001/XMLSchema-instance"
-    Basicudi = "https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/BasicUDI/v1"
     Udidi = "https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/UDIDI/v1"
     Commondi = "https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Device/CommonDevice/v1"
     Marketinfo = "https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/MktInfo/MarketInfo/v1"
     Lsn ="https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Common/LanguageSpecific/v1"
-    Links = "https://ec.europa.eu/tools/eudamed/dtx/datamodel/Entity/Links/v1"
 
-    device = ET.Element(
-    f"{{{Device}}}Device",
-    {f"{{{XSI}}}type": "device:MDRDeviceType"}
+    udidiDatas = ET.Element(
+    f"{{{UDIDIData}}}UDIDIData",
+    {f"{{{XSI}}}type": "udidiDatas:MDRUDIDIDataType"}
     )
 
     # -------------------------
-    # MDRBasicUDI
-    # -------------------------
-    basic = ET.SubElement(device, f"{{{Device}}}MDRBasicUDI")
-
-    ET.SubElement(basic, f"{{{Basicudi}}}riskClass").text = risk_class
-
-    modelET = ET.SubElement(basic, f"{{{Basicudi}}}modelName")
-    #ET.SubElement(model, f"{{{Basicudi}}}model").text = description_short
-    ET.SubElement(modelET, f"{{{Commondi}}}model").text = model
-    ET.SubElement(modelET, f"{{{Commondi}}}name").text = name
-
-    identifier = ET.SubElement(basic, f"{{{Basicudi}}}identifier")
-    ET.SubElement(identifier, f"{{{Commondi}}}DICode").text = primary_DI
-    ET.SubElement(identifier, f"{{{Commondi}}}issuingEntityCode").text = "GS1"
-
-    ET.SubElement(basic, f"{{{Basicudi}}}animalTissuesCells").text = "false"
-    ET.SubElement(basic, f"{{{Basicudi}}}ARActorCode").text = authorisedRepresentative_code
-    ET.SubElement(basic, f"{{{Basicudi}}}humanTissuesCells").text = "false"
-    ET.SubElement(basic, f"{{{Basicudi}}}MFActorCode").text = manufacturer_code
-    ET.SubElement(basic, f"{{{Basicudi}}}humanProductCheck").text = "false"
-    ET.SubElement(basic, f"{{{Basicudi}}}IIb_implantable_exceptions").text = "false"
-    ET.SubElement(basic, f"{{{Basicudi}}}medicinalProductCheck").text = "false"
-    #ET.SubElement(basic, f"{{{Basicudi}}}specialDevice").text  not needed
-    ET.SubElement(basic, f"{{{Basicudi}}}type").text = "DEVICE"
-    
-    #ET.SubElement(basic, f"{{{Commondi}}}type").text = "DEVICE"
-    ET.SubElement(basic, f"{{{Commondi}}}active").text = "false"
-    ET.SubElement(basic, f"{{{Commondi}}}administeringMedicine").text = "false"
-    ET.SubElement(basic, f"{{{Commondi}}}implantable").text = "false"
-    ET.SubElement(basic, f"{{{Commondi}}}measuringFunction").text = "false"
-    ET.SubElement(basic, f"{{{Commondi}}}reusable").text = reusable
-    
-    # -------------------------
     # MDRUDIDIData
     # -------------------------
-    udidi = ET.SubElement(device, f"{{{Device}}}MDRUDIDIData")
 
-    identifier2 = ET.SubElement(udidi, f"{{{Udidi}}}identifier")
+    identifier2 = ET.SubElement(udidiDatas, f"{{{Udidi}}}identifier")
     ET.SubElement(identifier2, f"{{{Commondi}}}DICode").text = basic_UDIDI
     ET.SubElement(identifier2, f"{{{Commondi}}}issuingEntityCode").text = "GS1"
 
-    status = ET.SubElement(udidi, f"{{{Udidi}}}status")
+    status = ET.SubElement(udidiDatas, f"{{{Udidi}}}status")
     ET.SubElement(status, f"{{{Commondi}}}code").text = "ON_THE_MARKET"
 
-    desc = ET.SubElement(udidi, f"{{{Udidi}}}additionalDescription")
+    desc = ET.SubElement(udidiDatas, f"{{{Udidi}}}additionalDescription")
     name_block = ET.SubElement(desc, f"{{{Lsn}}}name")
 
     ET.SubElement(name_block, f"{{{Lsn}}}language").text = "EN"
     ET.SubElement(name_block, f"{{{Lsn}}}textValue").text = description
 
-    basicUDI = ET.SubElement(udidi, f"{{{Udidi}}}basicUDIIdentifier")
+    basicUDI = ET.SubElement(udidiDatas, f"{{{Udidi}}}basicUDIIdentifier")
     ET.SubElement(basicUDI, f"{{{Commondi}}}DICode").text = primary_DI
     ET.SubElement(basicUDI, f"{{{Commondi}}}issuingEntityCode").text = "GS1"
 
-    ET.SubElement(udidi, f"{{{Udidi}}}MDNCodes").text = mdn_code
-    ET.SubElement(udidi, f"{{{Udidi}}}productionIdentifier").text = "BATCH_NUMBER MANUFACTURING_DATE"
-    ET.SubElement(udidi, f"{{{Udidi}}}referenceNumber").text = reference
-    ET.SubElement(udidi, f"{{{Udidi}}}sterile").text = "false"
-    ET.SubElement(udidi, f"{{{Udidi}}}sterilization").text = sterilization
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}MDNCodes").text = mdn_code
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}productionIdentifier").text = "BATCH_NUMBER MANUFACTURING_DATE"
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}referenceNumber").text = reference
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}sterile").text = "false"
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}sterilization").text = sterilization
 
-    trade = ET.SubElement(udidi, f"{{{Udidi}}}tradeNames")
+    trade = ET.SubElement(udidiDatas, f"{{{Udidi}}}tradeNames")
     trade_name_block = ET.SubElement(trade, f"{{{Lsn}}}name")
 
-    #packages = ET.SubElement(udidi, f"{{{Udidi}}}packages")
+    #packages = ET.SubElement(udidiDatas, f"{{{Udidi}}}packages")
     #package = ET.SubElement(packages, f"{{{Udidi}}}package")
 
     # identifier
@@ -129,7 +96,7 @@ def create_device_xml(
     ET.SubElement(trade_name_block, f"{{{Lsn}}}textValue").text = trade_name
 
     ET.SubElement(
-        udidi,
+        udidiDatas,
         f"{{{Udidi}}}numberOfReuses"
     ).text = str(number_of_reuses)
 
@@ -137,7 +104,7 @@ def create_device_xml(
     # Market Infos
     # -------------------------
     market_infos = ET.SubElement(
-        udidi,
+        udidiDatas,
         f"{{{Udidi}}}marketInfos"
     )
 
@@ -170,11 +137,11 @@ def create_device_xml(
             mi,
             f"{{{Marketinfo}}}startDate"
         ).text = start_date
-    ET.SubElement(udidi, f"{{{Udidi}}}baseQuantity").text = number_of_items
-    ET.SubElement(udidi, f"{{{Udidi}}}latex").text = "false"
-    ET.SubElement(udidi, f"{{{Udidi}}}reprocessed").text = "false"
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}baseQuantity").text = number_of_items
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}latex").text = "false"
+    ET.SubElement(udidiDatas, f"{{{Udidi}}}reprocessed").text = "false"
 
-    clinical_sizes = ET.SubElement(udidi, f"{{{Udidi}}}clinicalSizes")
+    clinical_sizes = ET.SubElement(udidiDatas, f"{{{Udidi}}}clinicalSizes")
 
     # -------------------
     # Diameter
@@ -202,4 +169,4 @@ def create_device_xml(
     ET.SubElement(cs2, f"{{{Commondi}}}value").text = str(length)
     ET.SubElement(cs2, f"{{{Commondi}}}valueUnit").text = "MU50"
 
-    return device
+    return udidiDatas
