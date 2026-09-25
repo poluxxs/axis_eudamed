@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import re
 
-def create_udidata_xml(
+def UDIDI_MDR_xml(
     risk_class,
     model,
     name,

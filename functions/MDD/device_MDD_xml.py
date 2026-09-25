@@ -38,13 +38,13 @@ def create_device_xml(
 
     device = ET.Element(
     f"{{{Device}}}Device",
-    {f"{{{XSI}}}type": "device:MDRDeviceType"}
+    {f"{{{XSI}}}type": "device:MDEUDeviceType"}
     )
 
     # -------------------------
-    # MDRBasicUDI
+    # MDEUData
     # -------------------------
-    basic = ET.SubElement(device, f"{{{Device}}}MDRBasicUDI")
+    basic = ET.SubElement(device, f"{{{Device}}}MDEUData")
 
     ET.SubElement(basic, f"{{{Basicudi}}}riskClass").text = risk_class
 
